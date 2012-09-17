@@ -23,12 +23,21 @@ typedef enum {
   RadioOption3,
 } RadioOptions;
 
-@interface FormCellCatalogTableViewController() <UITextFieldDelegate>
+// This enumeration is used in the sub radio group mapping.
+typedef enum {
+  SubRadioOption1,
+  SubRadioOption2,
+  SubRadioOption3,
+} SubRadioOptions;
+
+@interface FormCellCatalogTableViewController() <UITextFieldDelegate, NIRadioGroupDelegate>
 @property (nonatomic, readwrite, retain) NITableViewModel* model;
 
 // A radio group object allows us to easily maintain radio group-style interactions in the table
 // view.
 @property (nonatomic, readwrite, retain) NIRadioGroup* radioGroup;
+@property (nonatomic, readwrite, retain) NIRadioGroup* subRadioGroup;
+@property (nonatomic, readwrite, retain) NITableViewActions* actions;
 @end
 
 
@@ -39,22 +48,26 @@ typedef enum {
 
 @synthesize model = _model;
 @synthesize radioGroup = _radioGroup;
+@synthesize subRadioGroup = _subRadioGroup;
+@synthesize actions = _actions;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)dealloc {
   // The model is a retained object in this controller, so we must release it when the controller
   // is deallocated.
-  [_model release]; _model = nil;
-  [_radioGroup release]; _radioGroup = nil;
-  
+  [_model release];
+  [_radioGroup release];
+  [_subRadioGroup release];
+  [_actions release];
+
   [super dealloc];
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-  if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
+- (id)initWithStyle:(UITableViewStyle)style {
+  if ((self = [super initWithStyle:UITableViewStyleGrouped])) {
     self.title = NSLocalizedString(@"Form Cells", @"Controller Title: Form Cells");
 
     NISubtitleCellObject* radioObject1 = [NISubtitleCellObject cellWithTitle:@"Radio 1"
@@ -63,10 +76,30 @@ typedef enum {
                                                                     subtitle:@"Second option"];
     NISubtitleCellObject* radioObject3 = [NISubtitleCellObject cellWithTitle:@"Radio 3"
                                                                     subtitle:@"Third option"];
+    NITitleCellObject* button = [NITitleCellObject cellWithTitle:@"Button with alert"];
+
+    NISubtitleCellObject* subRadioObject1 = [NISubtitleCellObject cellWithTitle:@"Sub Radio 1"
+                                                                       subtitle:@"First option"];
+    NISubtitleCellObject* subRadioObject2 = [NISubtitleCellObject cellWithTitle:@"Sub Radio 2"
+                                                                       subtitle:@"Second option"];
+    NISubtitleCellObject* subRadioObject3 = [NISubtitleCellObject cellWithTitle:@"Sub Radio 3"
+                                                                       subtitle:@"Third option"];
+
+    _subRadioGroup = [[NIRadioGroup alloc] initWithController:self];
+    _subRadioGroup.cellTitle = @"Selection";
+    _subRadioGroup.controllerTitle = @"Make a Selection";
+    _subRadioGroup.delegate = self;
+    [_subRadioGroup mapObject:subRadioObject1 toIdentifier:SubRadioOption1];
+    [_subRadioGroup mapObject:subRadioObject2 toIdentifier:SubRadioOption2];
+    [_subRadioGroup mapObject:subRadioObject3 toIdentifier:SubRadioOption3];
+    _subRadioGroup.selectedIdentifier = SubRadioOption1;
+
     NSArray* tableContents =
     [NSArray arrayWithObjects:
      @"Radio Cells",
      radioObject1, radioObject2, radioObject3,
+     @"Sub Radio Groups",
+     _subRadioGroup,
 
      @"NITextInputFormElement",
      [NITextInputFormElement textInputElementWithID:0 placeholderText:@"Placeholder" value:nil],
@@ -80,17 +113,27 @@ typedef enum {
      [NISwitchFormElement switchElementWithID:0 labelText:@"Switch with a really long label that will be cut off" value:YES],
 
      @"NIButtonFormElement",
-     [NIButtonFormElement buttonElementWithID:0
-                                    labelText:@"Button with alert"
-                                 tappedTarget:self
-                               tappedSelector:@selector(showAlert:)],
+     button,
      nil];
 
     _radioGroup = [[NIRadioGroup alloc] init];
+    _radioGroup.delegate = self;
     [_radioGroup mapObject:radioObject1 toIdentifier:RadioOption1];
     [_radioGroup mapObject:radioObject2 toIdentifier:RadioOption2];
     [_radioGroup mapObject:radioObject3 toIdentifier:RadioOption3];
     _radioGroup.selectedIdentifier = RadioOption1;
+
+    _actions = [[NITableViewActions alloc] initWithController:self];
+    [_actions attachTapAction:^(id object, UIViewController *controller) {
+      UIAlertView* alertView =
+          [[[UIAlertView alloc] initWithTitle:@"This is an alert!"
+                                     message:@"Don't panic."
+                                    delegate:nil
+                           cancelButtonTitle:@"Neat!"
+                           otherButtonTitles:nil] autorelease];
+      [alertView show];
+      return YES;
+    } toObject:button];
 
     // We let the Nimbus cell factory create the cells.
     _model = [[NITableViewModel alloc] initWithSectionedArray:tableContents
@@ -99,17 +142,6 @@ typedef enum {
   return self;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)showAlert:(id)button {
-  UIAlertView* alertView =
-      [[[UIAlertView alloc] initWithTitle:@"This is an alert!"
-                                 message:@"Don't panic."
-                                delegate:nil
-                       cancelButtonTitle:@"Neat!"
-                       otherButtonTitles:nil] autorelease];
-  [alertView show];
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)viewDidLoad {
@@ -121,6 +153,10 @@ typedef enum {
   // view is unloaded (more importantly: you shouldn't, due to the reason just outlined
   // regarding loadView).
   self.tableView.dataSource = _model;
+
+  self.tableView.delegate = [self.radioGroup forwardingTo:
+                             [self.subRadioGroup forwardingTo:
+                              [self.actions forwardingTo:self.tableView.delegate]]];
 
   // When including text editing cells in table views you should provide a means for the user to
   // stop editing the control. To do this we add a gesture recognizer to the table view.
@@ -173,33 +209,36 @@ typedef enum {
       textInputCell.textField.textColor = [UIColor blackColor];
     }
   }
+}
 
-  id object = [self.model objectAtIndexPath:indexPath];
-  // This helper method checks whether the object is in the radio group and, if it is, updates
-  // the selection state accordingly.
-  if ([self.radioGroup willDisplayCell:cell forObject:object]) {
-    cell.selectionStyle = UITableViewCellSelectionStyleBlue;
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma mark - NIRadioGroupDelegate
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (void)radioGroup:(NIRadioGroup *)radioGroup didSelectIdentifier:(NSInteger)identifier {
+  if (radioGroup == self.radioGroup) {
+    NSLog(@"Radio group selection: %d", identifier);
+  } else if (radioGroup == self.subRadioGroup) {
+    NSLog(@"Sub radio group selection: %d", identifier);
   }
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)tableView:(UITableView*)tableView didSelectRowAtIndexPath:(NSIndexPath*)indexPath {
-  id object = [self.model objectAtIndexPath:indexPath];
-  // This helper method checks whether the selected object is within the radio group and, if it is,
-  // updates the selection. If the selection changes then the helper method returns YES so that we
-  // can react accordingly.
-  if ([self.radioGroup tableView:tableView didSelectObject:object atIndexPath:indexPath]) {
-    NSLog(@"Radio group selection changed: %d", self.radioGroup.selectedIdentifier);
+- (NSString *)radioGroup:(NIRadioGroup *)radioGroup textForIdentifier:(NSInteger)identifier {
+  switch (identifier) {
+    case SubRadioOption1:
+      return @"Option 1";
+    case SubRadioOption2:
+      return @"Option 2";
+    case SubRadioOption3:
+      return @"Option 3";
   }
-
-  UITableViewCell* selectedCell = [self.tableView.dataSource tableView:tableView cellForRowAtIndexPath:indexPath];
-  if ([selectedCell isKindOfClass:[NIButtonFormElementCell class]]) {
-    NIButtonFormElementCell* buttonCell = (NIButtonFormElementCell*)selectedCell;
-    [buttonCell buttonWasTapped:selectedCell];
-  }
-  // Clear the selection state when we're done.
-  [tableView deselectRowAtIndexPath:indexPath animated:YES];
+  return nil;
 }
 
 

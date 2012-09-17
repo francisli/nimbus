@@ -15,20 +15,37 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
+#import "NICellFactory.h"
+
+@protocol NIRadioGroupDelegate;
 
 /**
- * A general-purpose radio cell group.
+ * A general-purpose radio group.
  *
  * This group object manages radio-style selection of objects. Only one object may be selected at
  * a time.
  *
  * Due to the general-purpose nature of this object, it can be used with UITableViews or any other
- * view that has sets of objects being displayed. There are helper methods specifically for
- * UITableViews to reduce code duplication.
+ * view that has sets of objects being displayed. This object can insert itself into a
+ * UITableViewDelegate call chain to minimize the amount of code that needs to be written in your
+ * controller.
  *
- *      @ingroup TableViewForms
+ * If you add a NIRadioGroup object to a NITableViewModel, it will show a cell that displays the
+ * current radio group selection. This cell is also tappable. Tapping this cell will push a
+ * controller onto the navigation stack that presents the radio group options for the user to
+ * select. The radio group delegate is notified immediately when a selection is made and the
+ * tapped cell is also updated to reflect the new selection.
+ *
+ *      @ingroup ModelTools
  */
-@interface NIRadioGroup : NSObject
+@interface NIRadioGroup : NSObject <NICellObject, UITableViewDelegate>
+
+// Designated initializer.
+- (id)initWithController:(UIViewController *)controller;
+
+@property (nonatomic, readwrite, assign) id<NIRadioGroupDelegate> delegate;
 
 #pragma mark Mapping Objects
 
@@ -46,12 +63,76 @@
 - (BOOL)isObjectSelected:(id)object;
 - (NSInteger)identifierForObject:(id)object;
 
-#pragma mark UITableView Helpers
+#pragma mark Forwarding
 
-- (BOOL)willDisplayCell:(UITableViewCell *)cell forObject:(id)object;
-- (BOOL)tableView:(UITableView*)tableView didSelectObject:(id)object atIndexPath:(NSIndexPath*)indexPath;
+@property (nonatomic, readwrite, assign) UITableViewCellSelectionStyle tableViewCellSelectionStyle;
+- (id<UITableViewDelegate>)forwardingTo:(id<UITableViewDelegate>)forwardDelegate;
+- (void)removeForwarding:(id<UITableViewDelegate>)forwardDelegate;
+
+#pragma mark Sub Radio Groups
+
+@property (nonatomic, readwrite, copy) NSString* cellTitle;
+@property (nonatomic, readwrite, copy) NSString* controllerTitle;
+- (NSArray *)allObjects;
 
 @end
+
+/**
+ * The delegate for NIRadioGroup.
+ *
+ *      @ingroup ModelTools
+ */
+@protocol NIRadioGroupDelegate <NSObject>
+@required
+
+/**
+ * Called when the user changes the radio group selection.
+ *
+ *      @param radioGroup The radio group object.
+ *      @param identifier The newly selected identifier.
+ */
+- (void)radioGroup:(NIRadioGroup *)radioGroup didSelectIdentifier:(NSInteger)identifier;
+
+@optional
+
+/**
+ * Fetches the text that will be displayed in a radio group cell for the current selection.
+ *
+ * This is only used when the radio group is added to a table view as a sub radio group.
+ */
+- (NSString *)radioGroup:(NIRadioGroup *)radioGroup textForIdentifier:(NSInteger)identifier;
+
+@end
+
+/**
+ * The cell that is displayed for a NIRadioGroup object when it is displayed in a UITableView.
+ *
+ * This class is exposed publicly so that you may subclass it and customize the way it displays
+ * its information. You can override the cell class that the radio group uses in two ways:
+ *
+ * 1. Subclass NIRadioGroup and return a different cell class in -cellClass.
+ * 2. Create a NICellFactory and map NIRadioGroup to a different cell class and then use this
+ *    factory for your model in your table view controller.
+ *
+ * By default this cell displays the cellTitle property of the radio group on the left and the
+ * text retrieved from the radio group delegate's radioGroup:textForIdentifier: method on the right.
+ */
+@interface NIRadioGroupCell : UITableViewCell <NICell>
+@end
+
+/** @name Creating Radio Groups */
+
+/**
+ * Initializes a newly allocated radio group object with the given controller.
+ *
+ * This is the designated initializer.
+ *
+ * The given controller is stored as a weak reference internally.
+ *
+ *      @param controller The controller that will be used when this object is used as a sub radio
+ *                        group.
+ *      @fn NIRadioGroup::initWithController:
+ */
 
 /** @name Mapping Objects */
 
@@ -114,28 +195,62 @@
  *      @fn NIRadioGroup::identifierForObject:
  */
 
-/** @name UITableView Helpers */
+/** @name Forwarding */
 
 /**
- * Helper method to be used in UITableViewDelegate's tableView:willDisplayCell:forRowAtIndexPath:
+ * The cell selection style that will be applied to the cell when it is displayed using
+ * delegate forwarding.
  *
- * Checks whether the given object exists within this radio group and, if it is, updates the
- * cell accessory type accordingly.
+ * By default this is UITableViewCellSelectionStyleBlue.
  *
- *      @param cell The table view cell that is about to be displayed.
- *      @param object The object that will was mapped to this cell view.
- *      @returns YES if the cell is within this radio group, NO otherwise.
- *      @fn NIRadioGroup::willDisplayCell:forObject:
+ *      @fn NIRadioGroup::tableViewCellSelectionStyle
  */
 
 /**
- * Helper method to be used in UITableViewDelegate's tableView:didSelectRowAtIndexPath::
+ * Sets the delegate that table view methods should be forwarded to.
  *
- * Updates the radio group selection if the selected object is within this radio group.
+ * This method allows you to insert the radio group into the call chain for the table view's
+ * delegate methods.
  *
- *      @param tableView The table view within which this object resides.
- *      @param object The object that was selected.
- *      @param indexPath The index path of the selected object.
- *      @returns YES if the radio group selection changed, NO otherwise.
- *      @fn NIRadioGroup::tableView:didSelectObject:atIndexPath:
+ * Example:
+ *
+@code
+// Let the radio group handle delegate methods and then forward them to whatever delegate was
+// already assigned.
+self.tableView.delegate = [self.radioGroup forwardingTo:self.tableView.delegate];
+@endcode
+ *
+ *      @param forwardDelegate The delegate to forward invocations to.
+ *      @returns self so that this method can be chained.
+ *      @fn NIRadioGroup::forwardingTo:
+ */
+
+/**
+ * Removes the delegate from the forwarding chain.
+ *
+ * If a forwared delegate is about to be released but this object may live on, you must remove the
+ * forwarding in order to avoid invalid access errors at runtime.
+ *
+ *      @param forwardDelegate The delegate to stop forwarding invocations to.
+ *      @fn NIRadioGroup::removeForwarding:
+ */
+
+/**
+ * The title of the cell that is displayed for a radio group in a UITableView.
+ *
+ *      @fn NIRadioGroup::cellTitle
+ */
+
+/**
+ * The title of the controller that shows the sub radio group selection.
+ *
+ *      @fn NIRadioGroup::controllerTitle
+ */
+
+/**
+ * An array of mapped objects in this radio group, ordered in the same order they were mapped.
+ *
+ * This is used primarily by NIRadioGroupController to display the radio group options.
+ *
+ *      @fn NIRadioGroup::allObjects
  */

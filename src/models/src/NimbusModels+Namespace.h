@@ -28,12 +28,6 @@
 #endif
 
 // Classes
-#ifndef NIButtonFormElement
-#define NIButtonFormElement __NIMBUS_NS_SYMBOL(NIButtonFormElement)
-#endif
-#ifndef NIButtonFormElementCell
-#define NIButtonFormElementCell __NIMBUS_NS_SYMBOL(NIButtonFormElementCell)
-#endif
 #ifndef NICellFactory
 #define NICellFactory __NIMBUS_NS_SYMBOL(NICellFactory)
 #endif
@@ -58,6 +52,12 @@
 #ifndef NISwitchFormElementCell
 #define NISwitchFormElementCell __NIMBUS_NS_SYMBOL(NISwitchFormElementCell)
 #endif
+#ifndef NITableViewAction
+#define NITableViewAction __NIMBUS_NS_SYMBOL(NITableViewAction)
+#endif
+#ifndef NITableViewActions
+#define NITableViewActions __NIMBUS_NS_SYMBOL(NITableViewActions)
+#endif
 #ifndef NITableViewModel
 #define NITableViewModel __NIMBUS_NS_SYMBOL(NITableViewModel)
 #endif
@@ -80,5 +80,8 @@
 #define NITitleCellObject __NIMBUS_NS_SYMBOL(NITitleCellObject)
 #endif
 // Functions
+#ifndef NIPushControllerAction
+#define NIPushControllerAction __NIMBUS_NS_SYMBOL(NIPushControllerAction)
+#endif
 // Externs
 #endif
