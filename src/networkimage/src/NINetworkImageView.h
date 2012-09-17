@@ -97,6 +97,7 @@ typedef enum {
 
 @property (nonatomic, readwrite, retain) UIImage* initialImage;     // Default: nil
 @property (nonatomic, readwrite, assign) BOOL sizeForDisplay;       // Default: YES
+@property (nonatomic, readwrite, assign) BOOL fadeInImageUponLoad;          // Default: NO
 @property (nonatomic, readwrite, assign) NINetworkImageViewScaleOptions scaleOptions; // Default: NINetworkImageViewScaleToFitLeavesExcessAndScaleToFillCropsExcess
 @property (nonatomic, readwrite, assign) CGInterpolationQuality interpolationQuality; // Default: kCGInterpolationDefault
 
@@ -164,6 +165,9 @@ typedef enum {
  * The asynchronous download failed.
  */
 - (void)networkImageView:(NINetworkImageView *)imageView didFailWithError:(NSError *)error;
+
+- (void)networkImageViewDidStartFadeIn:(NINetworkImageView*)imageView;
+- (void)networkImageViewDidFinishFadeIn:(NINetworkImageView*)imageView;
 
 @end
 

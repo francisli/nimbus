@@ -41,6 +41,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 @implementation NINetworkImageView
 
+@synthesize fadeInImageUponLoad     = _fadeInImageUponLoad;
 @synthesize operation               = _operation;
 @synthesize sizeForDisplay          = _sizeForDisplay;
 @synthesize scaleOptions            = _scaleOptions;
@@ -200,8 +201,35 @@
                           expiresAfter: expirationDate];
   }
 
-  // Display the new image.
-  [self setImage:image];
+  // Display the new image.    
+    if (self.fadeInImageUponLoad) {
+        UIImageView *standIn = [[[UIImageView alloc] initWithFrame:self.frame] autorelease];
+        standIn.backgroundColor = self.backgroundColor;
+        standIn.image = self.image;
+        standIn.contentMode = self.contentMode;
+        standIn.clipsToBounds = self.clipsToBounds;
+        [self.superview insertSubview:standIn belowSubview:self];
+        
+        [self setImage:image];        
+        
+        self.alpha = 0;
+        
+        if ([self.delegate respondsToSelector:@selector(networkImageViewDidStartFadeIn:)]) {
+            [self.delegate networkImageViewDidStartFadeIn:self];
+        }
+        
+        [UIView animateWithDuration:0.35 delay:0.0 options:UIViewAnimationCurveLinear animations:^{
+            self.alpha = 1.0;
+        } completion:^(BOOL finished) {
+            [standIn removeFromSuperview];
+            
+            if ([self.delegate respondsToSelector:@selector(networkImageViewDidFinishFadeIn:)]) {
+                [self.delegate networkImageViewDidFinishFadeIn:self];
+            }            
+        }];
+    } else {
+        [self setImage:image];        
+    }
 
   self.operation = nil;
 
