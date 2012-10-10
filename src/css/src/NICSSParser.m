@@ -237,7 +237,7 @@ int cssConsume(char* text, int token) {
                 [existingProperties setObject:[_mutatingRuleset objectForKey:key] forKey:key];
               }
               // Add the order of the new properties.
-              [[existingProperties objectForKey:kPropertyOrderKey] addObjectsFromArray:
+              [(NSMutableArray *)[existingProperties objectForKey:kPropertyOrderKey] addObjectsFromArray:
                [_mutatingRuleset objectForKey:kPropertyOrderKey]];
             }
           }
@@ -350,7 +350,7 @@ int cssConsume(char* text, int token) {
 
             } else {
               // Append the property order.
-              [[mergedScopeProperties objectForKey:kPropertyOrderKey] addObjectsFromArray:
+              [(NSMutableArray *)[mergedScopeProperties objectForKey:kPropertyOrderKey] addObjectsFromArray:
                [properties objectForKey:kPropertyOrderKey]];
             }
           }
