@@ -10,7 +10,7 @@
 
 @class NIFetchedResultsTableViewModel;
 
-@protocol NIFetchedResultsTableViewModelDelegate <NSObject, NITableViewModelDelegate>
+@protocol NIFetchedResultsTableViewModelDelegate <NSObject, NIMutableTableViewModelDelegate>
 
 @optional
 
@@ -31,10 +31,10 @@
 
 @end
 
-@interface NIFetchedResultsTableViewModel : NITableViewModel <NSFetchedResultsControllerDelegate> {
-    @private
+@interface NIFetchedResultsTableViewModel : NIMutableTableViewModel <NSFetchedResultsControllerDelegate> {
+@private
     NSFetchedResultsController *_controller;
-    __weak UITableView *_tableView;
+    __unsafe_unretained UITableView *_tableView;
 }
 @property (nonatomic, NI_WEAK) id<NIFetchedResultsTableViewModelDelegate> delegate;
 
