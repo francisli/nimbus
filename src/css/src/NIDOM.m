@@ -100,7 +100,9 @@
     selectors = [[NSMutableArray alloc] init];
     [_viewToSelectorsMap setObject:selectors forKey:key];
   }
-  [selectors addObject:selector];
+  if (![selectors containsObject:selector]) {
+    [selectors addObject:selector];
+  }
 }
 
 
