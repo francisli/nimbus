@@ -69,6 +69,23 @@
   return self;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (id)initWithStylesheet:(NIStylesheet *)stylesheet autoRefresh:(BOOL)autoRefresh {
+    self = [self initWithStylesheet:stylesheet];
+    if (self) {
+        if (autoRefresh) {
+            [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(refresh)
+                                                         name:NIStylesheetDidChangeNotification
+                                                       object:stylesheet];
+        }
+    }
+    return self;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -236,6 +236,8 @@ _chameleonObserver = [[NIChameleonObserver alloc] initWithStylesheetCache:_style
 #import "UILabel+NIStyleable.h"
 #import "UINavigationBar+NIStyleable.h"
 #import "UISearchBar+NIStyleable.h"
+#import "UITableView+NIStyleable.h"
+#import "UITableViewHeaderFooterView+NIStyleable.h"
 #import "UIToolbar+NIStyleable.h"
 #import "UIView+NIStyleable.h"
 

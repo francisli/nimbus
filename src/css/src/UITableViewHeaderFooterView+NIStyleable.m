@@ -35,6 +35,7 @@ NI_FIX_CATEGORY_BUG(UITableViewHeaderFooterView_NIStyleable)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)applyStyleWithRuleSet:(NICSSRuleset *)ruleSet {
+    [self applyViewStyleWithRuleSet:ruleSet];
     [self applyTableViewHeaderFooterStyleWithRuleSet:ruleSet];
 }
 

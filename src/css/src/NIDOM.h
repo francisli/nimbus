@@ -69,6 +69,7 @@ _dom = [[NIDOM alloc] initWithStylesheet:stylesheet];
 // Designated initializer.
 
 - (id)initWithStylesheet:(NIStylesheet *)stylesheet;
+- (id)initWithStylesheet:(NIStylesheet *)stylesheet autoRefresh:(BOOL)autoRefresh;
 
 + (id)domWithStylesheet:(NIStylesheet *)stylesheet;
 + (id)domWithStylesheetWithPathPrefix:(NSString *)pathPrefix paths:(NSString *)path, ...;
