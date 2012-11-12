@@ -55,11 +55,20 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (NSArray *)addObjectsFromArray:(NSArray *)array {
-  NSMutableArray* indices = [NSMutableArray array];
-  for (id object in array) {
-    [indices addObject:[[self addObject:object] objectAtIndex:0]];
-  }
-  return indices;
+    if (self.sections.count == 0) {
+        [self _appendSection];
+    }
+    return [self addObjectsFromArray:array toSection:[self.sections count] - 1];
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (NSArray *)addObjectsFromArray:(NSArray *)array toSection:(NSUInteger)sectionIndex {
+    NSMutableArray* indices = [NSMutableArray array];
+    for (id object in array) {
+        [indices addObject:[[self addObject:object toSection:sectionIndex] objectAtIndex:0]];
+    }
+    return indices;
 }
 
 
