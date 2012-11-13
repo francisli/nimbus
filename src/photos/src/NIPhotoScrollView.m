@@ -101,6 +101,7 @@
 @synthesize photoScrollViewDelegate = _photoScrollViewDelegate;
 @synthesize doubleTapToZoomIsEnabled = _doubleTapToZoomIsEnabled;
 @synthesize maximumScale = _maximumScale;
+@synthesize loading = _loading;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,6 +116,11 @@
     _scrollView = [[NICenteringScrollView alloc] initWithFrame:self.bounds];
     _scrollView.autoresizingMask = (UIViewAutoresizingFlexibleWidth
                                     | UIViewAutoresizingFlexibleHeight);
+
+    _loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    [_loadingView sizeToFit];
+    _loadingView.frame = NIFrameOfCenteredViewWithinView(_loadingView, self);
+    _loadingView.autoresizingMask = UIViewAutoresizingFlexibleMargins;
 
     // We implement viewForZoomingInScrollView: and return the image view for zooming.
     _scrollView.delegate = self;
@@ -135,6 +141,7 @@
 
     [_scrollView addSubview:_imageView];
     [self addSubview:_scrollView];
+    [self addSubview:_loadingView];
   }
   return self;
 }
@@ -284,6 +291,16 @@
   _scrollView.zoomScale = _scrollView.minimumZoomScale;
 
   [self setNeedsLayout];
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (void)setLoading:(BOOL)loading {
+  if (loading) {
+    [_loadingView startAnimating];
+  } else {
+    [_loadingView stopAnimating];
+  }
 }
 
 
