@@ -371,14 +371,19 @@
       // Detail disclosure indicator takes precedence over regular disclosure indicator.
       if (nil != action.detailAction || nil != action.detailSelector) {
         cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
-
+        if (tableView.allowsSelectionDuringEditing) {
+          cell.editingAccessoryType = UITableViewCellAccessoryDetailDisclosureButton;
+        }
       } else if (nil != action.navigateAction || nil != action.navigateSelector) {
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-
+        if (tableView.allowsSelectionDuringEditing) {
+          cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        }
       } else {
         // We must maintain consistency of modifications to the accessoryType within this call due
         // to the fact that cells will be reused.
         cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.editingAccessoryType = UITableViewCellAccessoryNone;
       }
 
       // If the cell is tappable, reflect that in the selection style.
