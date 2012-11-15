@@ -120,6 +120,13 @@
   return [NSIndexSet indexSetWithIndex:index];
 }
 
+- (NSIndexSet *)updateSectionTitle:(NSString *)title atIndex:(NSUInteger)index {
+    NIDASSERT(index >= 0 && index < self.sections.count);
+    NITableViewModelSection *section = [self.sections objectAtIndex:index];
+    section.headerTitle = title;
+    return [NSIndexSet indexSetWithIndex:index];
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)updateSectionIndex {
