@@ -10,14 +10,18 @@
 
 @implementation NIFetchedResultsTableViewModel
 
-- (id)initWithFetchedResultsController:(NSFetchedResultsController *)controller
+@synthesize fetchedResultsController = _fetchedResultsController;
+@synthesize tableView = _tableView;
+@synthesize sectionIndexType = _sectionIndexType;
+
+- (id)initWithFetchedResultsController:(NSFetchedResultsController *)fetchedResultsController
                              tableView:(UITableView *)tableView
                               delegate:(id<NIFetchedResultsTableViewModelDelegate>)delegate
 {
     self = [super initWithDelegate:delegate];
     if (self) {
-        _controller = controller;
-        _controller.delegate = self;
+        _fetchedResultsController = fetchedResultsController;
+        _fetchedResultsController.delegate = self;
         _tableView = tableView;
     }
     return self;
@@ -25,35 +29,42 @@
 
 - (id)objectAtIndexPath:(NSIndexPath *)indexPath
 {
-    return [_controller objectAtIndexPath:indexPath];
+    return [_fetchedResultsController objectAtIndexPath:indexPath];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [[_controller.sections objectAtIndex:section] numberOfObjects];
+    return [[_fetchedResultsController.sections objectAtIndex:section] numberOfObjects];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return _controller.sections.count;
+    return _fetchedResultsController.sections.count;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    return [[_controller.sections objectAtIndex:section] name];
+    return [[_fetchedResultsController.sections objectAtIndex:section] name];
 }
 
 - (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView
 {
-    if (self.sectionIndexType != NITableViewModelSectionIndexNone) {
-        return _controller.sectionIndexTitles;
+    if (_sectionIndexType == NITableViewModelSectionIndexDynamic) {
+        return _fetchedResultsController.sectionIndexTitles;
     }
     return nil;
 }
 
+- (void)setSectionIndexType:(NITableViewModelSectionIndex)sectionIndexType
+                showsSearch:(BOOL)showsSearch
+               showsSummary:(BOOL)showsSummary
+{
+    _sectionIndexType = sectionIndexType;
+}
+
 - (NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index
 {
-    return [_controller sectionForSectionIndexTitle:title atIndex:index];
+    return [_fetchedResultsController sectionForSectionIndexTitle:title atIndex:index];
 }
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
@@ -70,7 +81,7 @@
                            rowAnimationForSection:sectionInfo
                                           atIndex:sectionIndex
                                     forChangeType:type
-                                   withController:_controller
+                                   withController:_fetchedResultsController
                                       inTableView:_tableView];
     }
     switch(type) {
@@ -98,7 +109,7 @@
                                       atIndexPath:indexPath
                                     forChangeType:type
                                      newIndexPath:newIndexPath
-                                   withController:_controller
+                                   withController:_fetchedResultsController
                                       inTableView:_tableView];
     }
     switch(type) {

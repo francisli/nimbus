@@ -31,14 +31,13 @@
 
 @end
 
-@interface NIFetchedResultsTableViewModel : NIMutableTableViewModel <NSFetchedResultsControllerDelegate> {
-@private
-    NSFetchedResultsController *_controller;
-    __unsafe_unretained UITableView *_tableView;
-}
+@interface NIFetchedResultsTableViewModel : NIMutableTableViewModel <NSFetchedResultsControllerDelegate>
+
+@property (nonatomic, NI_STRONG) NSFetchedResultsController *fetchedResultsController;
+@property (nonatomic, NI_WEAK) UITableView *tableView;
 @property (nonatomic, NI_WEAK) id<NIFetchedResultsTableViewModelDelegate> delegate;
 
-- (id)initWithFetchedResultsController:(NSFetchedResultsController *)controller
+- (id)initWithFetchedResultsController:(NSFetchedResultsController *)fetchedResultsController
                              tableView:(UITableView *)tableView
                               delegate:(id<NIFetchedResultsTableViewModelDelegate>)delegate;
 
