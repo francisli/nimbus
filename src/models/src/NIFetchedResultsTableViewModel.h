@@ -14,12 +14,26 @@
 
 @optional
 
+- (BOOL)tableViewModel:(NIFetchedResultsTableViewModel *)tableViewModel
+   shouldChangeSection:(id<NSFetchedResultsSectionInfo>)sectionInfo
+               atIndex:(NSUInteger)sectionIndex
+         forChangeType:(NSFetchedResultsChangeType)type
+        withController:(NSFetchedResultsController *)controller
+           inTableView:(UITableView *)tableView;
+
 - (UITableViewRowAnimation)tableViewModel:(NIFetchedResultsTableViewModel *)tableViewModel
                    rowAnimationForSection:(id <NSFetchedResultsSectionInfo>)sectionInfo
                                   atIndex:(NSUInteger)sectionIndex
                             forChangeType:(NSFetchedResultsChangeType)type
                            withController:(NSFetchedResultsController *)controller
                               inTableView:(UITableView *)tableView;
+
+- (BOOL)tableViewModel:(NIFetchedResultsTableViewModel *)tableViewModel
+    shouldChangeObject:(id)anObject
+           atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type
+          newIndexPath:(NSIndexPath *)newIndexPath
+        withController:(NSFetchedResultsController *)controller
+           inTableView:(UITableView *)tableView;
 
 - (UITableViewRowAnimation)tableViewModel:(NIFetchedResultsTableViewModel *)tableViewModel
                     rowAnimationForObject:(id)anObject

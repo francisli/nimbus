@@ -75,25 +75,36 @@
 - (void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo
            atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type {
     
-    UITableViewRowAnimation animation = UITableViewRowAnimationAutomatic;
-    if ([self.delegate respondsToSelector:@selector(tableViewModel:rowAnimationForSection:atIndex:forChangeType:withController:inTableView:)]) {
-        animation = [self.delegate tableViewModel:self
-                           rowAnimationForSection:sectionInfo
-                                          atIndex:sectionIndex
-                                    forChangeType:type
-                                   withController:_fetchedResultsController
-                                      inTableView:_tableView];
+    BOOL perform = YES;
+    if ([self.delegate respondsToSelector:@selector(tableViewModel:shouldChangeSection:atIndex:forChangeType:withController:inTableView:)]) {
+        perform = [self.delegate tableViewModel:self
+                            shouldChangeSection:sectionInfo
+                                        atIndex:sectionIndex
+                                  forChangeType:type
+                                 withController:_fetchedResultsController
+                                    inTableView:_tableView];
     }
-    switch(type) {
-        case NSFetchedResultsChangeInsert:
-            [_tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex]
-                      withRowAnimation:animation];
-            break;
-            
-        case NSFetchedResultsChangeDelete:
-            [_tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex]
-                      withRowAnimation:animation];
-            break;
+    if (perform) {
+        UITableViewRowAnimation animation = UITableViewRowAnimationAutomatic;
+        if ([self.delegate respondsToSelector:@selector(tableViewModel:rowAnimationForSection:atIndex:forChangeType:withController:inTableView:)]) {
+            animation = [self.delegate tableViewModel:self
+                               rowAnimationForSection:sectionInfo
+                                              atIndex:sectionIndex
+                                        forChangeType:type
+                                       withController:_fetchedResultsController
+                                          inTableView:_tableView];
+        }
+        switch(type) {
+            case NSFetchedResultsChangeInsert:
+                [_tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex]
+                          withRowAnimation:animation];
+                break;
+                
+            case NSFetchedResultsChangeDelete:
+                [_tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex]
+                          withRowAnimation:animation];
+                break;
+        }
     }
 }
 
@@ -102,36 +113,47 @@
        atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type
       newIndexPath:(NSIndexPath *)newIndexPath {
     
-    UITableViewRowAnimation animation = UITableViewRowAnimationAutomatic;
-    if ((type != NSFetchedResultsChangeMove) && [self.delegate respondsToSelector:@selector(tableViewModel:rowAnimationForObject:atIndexPath:forChangeType:newIndexPath:withController:inTableView:)]) {
-        animation = [self.delegate tableViewModel:self
-                            rowAnimationForObject:anObject
-                                      atIndexPath:indexPath
-                                    forChangeType:type
-                                     newIndexPath:newIndexPath
-                                   withController:_fetchedResultsController
-                                      inTableView:_tableView];
+    BOOL perform = YES;
+    if ([self.delegate respondsToSelector:@selector(tableViewModel:shouldChangeObject:atIndexPath:forChangeType:newIndexPath:withController:inTableView:)]) {
+        perform = [self.delegate tableViewModel:self
+                             shouldChangeObject:anObject
+                                    atIndexPath:indexPath
+                                  forChangeType:type
+                                   newIndexPath:newIndexPath
+                                 withController:_fetchedResultsController
+                                    inTableView:_tableView];
     }
-    switch(type) {
-            
-        case NSFetchedResultsChangeInsert:
-            [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath]
-                              withRowAnimation:animation];
-            break;
-            
-        case NSFetchedResultsChangeDelete:
-            [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
-                              withRowAnimation:animation];
-            break;
-            
-        case NSFetchedResultsChangeUpdate:
-            [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
-                              withRowAnimation:animation];
-            break;
-            
-        case NSFetchedResultsChangeMove:
-            [_tableView moveRowAtIndexPath:indexPath toIndexPath:newIndexPath];
-            break;
+    if (perform) {
+        UITableViewRowAnimation animation = UITableViewRowAnimationAutomatic;
+        if ((type != NSFetchedResultsChangeMove) && [self.delegate respondsToSelector:@selector(tableViewModel:rowAnimationForObject:atIndexPath:forChangeType:newIndexPath:withController:inTableView:)]) {
+            animation = [self.delegate tableViewModel:self
+                                rowAnimationForObject:anObject
+                                          atIndexPath:indexPath
+                                        forChangeType:type
+                                         newIndexPath:newIndexPath
+                                       withController:_fetchedResultsController
+                                          inTableView:_tableView];
+        }
+        switch(type) {
+            case NSFetchedResultsChangeInsert:
+                [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath]
+                                  withRowAnimation:animation];
+                break;
+                
+            case NSFetchedResultsChangeDelete:
+                [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
+                                  withRowAnimation:animation];
+                break;
+                
+            case NSFetchedResultsChangeUpdate:
+                [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
+                                  withRowAnimation:animation];
+                break;
+                
+            case NSFetchedResultsChangeMove:
+                [_tableView moveRowAtIndexPath:indexPath toIndexPath:newIndexPath];
+                break;
+        }
     }
 }
 
