@@ -68,6 +68,11 @@
 }
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
+    if ([self.delegate respondsToSelector:@selector(tableViewModel:controllerWillChangeContent:inTableView:)]) {
+        [self.delegate tableViewModel:self
+          controllerWillChangeContent:_fetchedResultsController
+                          inTableView:_tableView];
+    }
     [_tableView beginUpdates];
 }
 
@@ -160,6 +165,11 @@
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
     [_tableView endUpdates];
+    if ([self.delegate respondsToSelector:@selector(tableViewModel:controllerDidChangeContent:inTableView:)]) {
+        [self.delegate tableViewModel:self
+           controllerDidChangeContent:_fetchedResultsController
+                          inTableView:_tableView];
+    }
 }
 
 @end

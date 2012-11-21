@@ -14,6 +14,12 @@
 
 @optional
 
+- (void)tableViewModel:(NIFetchedResultsTableViewModel *)tableViewModel controllerWillChangeContent:(NSFetchedResultsController *)controller
+           inTableView:(UITableView *)tableView;
+
+- (void)tableViewModel:(NIFetchedResultsTableViewModel *)tableViewModel controllerDidChangeContent:(NSFetchedResultsController *)controller
+           inTableView:(UITableView *)tableView;
+
 - (BOOL)tableViewModel:(NIFetchedResultsTableViewModel *)tableViewModel
    shouldChangeSection:(id<NSFetchedResultsSectionInfo>)sectionInfo
                atIndex:(NSUInteger)sectionIndex
