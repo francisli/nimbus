@@ -51,6 +51,7 @@
   UIViewAutoresizing _autoresizing;
   UITableViewCellSeparatorStyle _tableViewCellSeparatorStyle;
   UIScrollViewIndicatorStyle _scrollViewIndicatorStyle;
+  UISegmentedControlStyle _segmentedControlStyle;
 
   union {
     struct {
@@ -75,6 +76,7 @@
       int Autoresizing : 1;
       int TableViewCellSeparatorStyle : 1;
       int ScrollViewIndicatorStyle : 1;
+      int SegmentedControlStyle : 1;
     } cached;
     int _data;
   } _is;
@@ -144,6 +146,9 @@
 
 - (BOOL)hasScrollViewIndicatorStyle;
 - (UIScrollViewIndicatorStyle)scrollViewIndicatorStyle; // -ios-scroll-view-indicator-style
+
+- (BOOL)hasSegmentedControlStyle;
+- (UISegmentedControlStyle)segmentedControlStyle; // -ios-segmented-control-style
 
 @end
 

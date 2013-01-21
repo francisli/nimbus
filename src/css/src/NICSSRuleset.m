@@ -48,6 +48,7 @@ static NSString* const kActivityIndicatorStyleKey = @"-ios-activity-indicator-st
 static NSString* const kAutoresizingKey = @"-ios-autoresizing";
 static NSString* const kTableViewCellSeparatorStyleKey = @"-ios-table-view-cell-separator-style";
 static NSString* const kScrollViewIndicatorStyleKey = @"-ios-scroll-view-indicator-style";
+static NSString* const kSegmentedControlStyleKey = @"-ios-segmented-control-style";
 
 // This color table is generated on-demand and is released when a memory warning is encountered.
 static NSDictionary* sColorTable = nil;
@@ -709,6 +710,34 @@ static NSDictionary* sColorTable = nil;
     _is.cached.ScrollViewIndicatorStyle = YES;
   }
   return _scrollViewIndicatorStyle;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (BOOL)hasSegmentedControlStyle {
+    return nil != [_ruleset objectForKey:kSegmentedControlStyleKey];
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (UISegmentedControlStyle)segmentedControlStyle {
+    NIDASSERT([self hasSegmentedControlStyle]);
+    if (!_is.cached.SegmentedControlStyle) {
+        NSArray* values = [_ruleset objectForKey:kSegmentedControlStyleKey];
+        NIDASSERT([values count] == 1);
+        NSString* value = [values objectAtIndex:0];
+        UISegmentedControlStyle style = UISegmentedControlStylePlain;
+        if ([value isEqualToString:@"bordered"]) {
+            style = UISegmentedControlStyleBordered;
+        } else if ([value isEqualToString:@"bar"]) {
+            style = UISegmentedControlStyleBar;
+        } else if ([value isEqualToString:@"bezeled"]) {
+            style = UISegmentedControlStyleBezeled;
+        }
+        _segmentedControlStyle = style;
+        _is.cached.SegmentedControlStyle = YES;
+    }
+    return _segmentedControlStyle;
 }
 
 
