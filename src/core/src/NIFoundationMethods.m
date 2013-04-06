@@ -47,19 +47,40 @@ CGRect NIRectShift(CGRect rect, CGFloat dx, CGFloat dy) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+CGRect NIEdgeInsetsOutsetRect(CGRect rect, UIEdgeInsets outsets) {
+  return CGRectMake(rect.origin.x - outsets.left,
+                    rect.origin.y - outsets.top,
+                    rect.size.width + outsets.left + outsets.right,
+                    rect.size.height + outsets.top + outsets.bottom);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+CGFloat NICenterX(CGSize containerSize, CGSize size) {
+  return floorf((containerSize.width - size.width) / 2.f);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+CGFloat NICenterY(CGSize containerSize, CGSize size) {
+  return floorf((containerSize.height - size.height) / 2.f);
+}
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 CGRect NIFrameOfCenteredViewWithinView(UIView* viewToCenter, UIView* containerView) {
   CGPoint origin;
   CGSize containerViewSize = containerView.bounds.size;
   CGSize viewSize = viewToCenter.frame.size;
-  origin.x = floorf((containerViewSize.width - viewSize.width) / 2.f);
-  origin.y = floorf((containerViewSize.height - viewSize.height) / 2.f);
+  origin.x = NICenterX(containerViewSize, viewSize);
+  origin.y = NICenterY(containerViewSize, viewSize);
   return CGRectMake(origin.x, origin.y, viewSize.width, viewSize.height);
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-CGSize NISizeOfStringWithLabelProperties(NSString *string, CGSize constrainedToSize, UIFont *font, UILineBreakMode lineBreakMode, NSInteger numberOfLines) {
+CGSize NISizeOfStringWithLabelProperties(NSString *string, CGSize constrainedToSize, UIFont *font, NSLineBreakMode lineBreakMode, NSInteger numberOfLines) {
   if (string.length == 0) {
     return CGSizeZero;
   }
