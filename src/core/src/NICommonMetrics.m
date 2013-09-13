@@ -83,7 +83,7 @@ NSTimeInterval NIDeviceRotationDuration(BOOL isFlippingUpsideDown) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 UIEdgeInsets NICellContentPadding(void) {
   if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"7.0")) {
-    UIEdgeInsetsMake(10, 15, 10, 15);
+    return UIEdgeInsetsMake(10, 15, 10, 15);
   }
   return UIEdgeInsetsMake(10, 10, 10, 10);
 }
