@@ -53,9 +53,9 @@
 
 @interface NIFetchedResultsTableViewModel : NIMutableTableViewModel <NSFetchedResultsControllerDelegate>
 
-@property (nonatomic, NI_STRONG) NSFetchedResultsController *fetchedResultsController;
-@property (nonatomic, NI_WEAK) UITableView *tableView;
-@property (nonatomic, NI_WEAK) id<NIFetchedResultsTableViewModelDelegate> delegate;
+@property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
+@property (nonatomic, weak) UITableView *tableView;
+@property (nonatomic, weak) id<NIFetchedResultsTableViewModelDelegate> delegate;
 
 - (id)initWithFetchedResultsController:(NSFetchedResultsController *)fetchedResultsController
                              tableView:(UITableView *)tableView
