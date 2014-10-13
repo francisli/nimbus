@@ -454,8 +454,9 @@ static const CGFloat kDatePickerTextFieldRightMargin = 5;
     //                                    withObject: _switchControl];
     
     // The following is a workaround to supress the warning and requires <objc/message.h>
-    objc_msgSend(switchElement.didChangeTarget, 
-                 switchElement.didChangeSelector, _switchControl);
+    int (*action)(id, SEL, UISwitch *) = (int (*)(id, SEL, UISwitch *))objc_msgSend;
+    action(switchElement.didChangeTarget,
+           switchElement.didChangeSelector, _switchControl);
   }
 }
 
@@ -644,8 +645,9 @@ static const CGFloat kDatePickerTextFieldRightMargin = 5;
     //                                               withObject:_segmentedControl];
 
     // The following is a workaround to supress the warning and requires <objc/message.h>
-    objc_msgSend(segmentedControlElement.didChangeTarget, 
-                 segmentedControlElement.didChangeSelector, _segmentedControl);
+    int (*action)(id, SEL, UISegmentedControl *) = (int (*)(id, SEL, UISegmentedControl *))objc_msgSend;
+    action(segmentedControlElement.didChangeTarget,
+           segmentedControlElement.didChangeSelector, _segmentedControl);
   }
 }
 
@@ -843,8 +845,9 @@ static const CGFloat kDatePickerTextFieldRightMargin = 5;
     // [datePickerElement.didChangeTarget performSelector:datePickerElement.didChangeSelector withObject:self.datePicker];
 
     // The following is a workaround to supress the warning and requires <objc/message.h>
-    objc_msgSend(datePickerElement.didChangeTarget, 
-                 datePickerElement.didChangeSelector, _datePicker);
+    int (*action)(id, SEL, UIDatePicker *) = (int (*)(id, SEL, UIDatePicker *))objc_msgSend;
+    action(datePickerElement.didChangeTarget,
+           datePickerElement.didChangeSelector, _datePicker);
 
   }
 }
