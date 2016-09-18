@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 Sedition Limited. All rights reserved.
 //
 
+#import <CoreData/CoreData.h>
+
 #import "NICollectionViewModel.h"
 
 @interface NIFetchedResultsCollectionViewModel : NICollectionViewModel <NSFetchedResultsControllerDelegate>
